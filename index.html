@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบออกบิลสรุปรายการสั่งซื้อ - HALFWAY MR.FANBOY</title>
+  <!-- Tailwind CSS สำหรับจัดดีไซน์ -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- ฟอนต์ภาษาไทย Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- ไลบรารีแปลงหน้าเว็บเป็นรูปภาพ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body { font-family: 'Prompt', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+    <!-- ฟอร์มกรอกข้อมูล (จะไม่ติดไปในรูป) -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-800 mb-4 pb-2 border-b flex items-center gap-2">
+        <span>📝</span> บันทึกข้อมูลคำสั่งซื้อ
+      </h2>
+
+      <!-- ข้อมูลลูกค้า -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อลูกค้า</label>
+          <input type="text" id="custName" placeholder="เช่น คุณสมชาย รักแฟนบอย" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">ช่องทางโซเชียล</label>
+            <select id="custSocial" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+              <option value="X (Twitter)">X (Twitter)</option>
+              <option value="Instagram">Instagram</option>
+              <option value="Facebook">Facebook</option>
+              <option value="Line">Line</option>
+              <option value="TikTok">TikTok</option>
+              <option value="อื่นๆ">อื่นๆ</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อบัญชี / Username</label>
+            <input type="text" id="custHandle" placeholder="@username" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- รูปแบบการจัดส่งและสถานะ -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">รูปแบบการรับสินค้า</label>
+          <select id="shippingType" onchange="toggleShippingFields()" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <option value="จัดส่งพัสดุ">📦 จัดส่งพัสดุ</option>
+            <option value="นัดรับ">🤝 นัดรับสินค้า</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">ค่าจัดส่ง (บาท)</label>
+          <input type="number" id="shippingFee" value="50" min="0" oninput="renderInvoice()" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">สถานะการชำระเงิน</label>
+          <select id="paymentStatus" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <option value="ชำระเงินเรียบร้อยแล้ว">🟢 ชำระเงินเรียบร้อยแล้ว</option>
+            <option value="รอชำระเงิน">🟡 รอชำระเงิน</option>
+            <option value="มัดจำแล้ว">🔵 มัดจำแล้ว</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label id="addressLabel" class="block text-sm font-medium text-slate-700 mb-1">ที่อยู่จัดส่ง / เบอร์โทรศัพท์</label>
+        <textarea id="custAddress" rows="2" placeholder="กรอกที่อยู่จัดส่ง พร้อมเบอร์โทรติดต่อ..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+      </div>
+
+      <!-- เพิ่มรายการสินค้า & ค่าหิ้วต่อชิ้น -->
+      <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 mb-4">
+        <h3 class="text-sm font-semibold text-amber-900 mb-2">➕ เลือกสินค้าและกำหนดค่าหิ้ว</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+          <div class="sm:col-span-5">
+            <label class="block text-xs text-slate-600 mb-1">รายการสินค้า</label>
+            <select id="productSelect" onchange="updateSubOptions()" class="w-full border rounded-lg p-2 text-sm bg-white"></select>
+          </div>
+          <div class="sm:col-span-3">
+            <label class="block text-xs text-slate-600 mb-1">แบบ / เมมเบอร์</label>
+            <select id="subOptionSelect" class="w-full border rounded-lg p-2 text-sm bg-white"></select>
+          </div>
+          <div class="sm:col-span-1">
+            <label class="block text-xs text-slate-600 mb-1">จำนวน</label>
+            <input type="number" id="itemQty" value="1" min="1" class="w-full border rounded-lg p-2 text-sm bg-white">
+          </div>
+          <div class="sm:col-span-1">
+            <label class="block text-xs text-amber-800 font-semibold mb-1">ค่าหิ้ว/ชิ้น</label>
+            <input type="number" id="itemCarryFee" value="20" min="0" class="w-full border border-amber-300 rounded-lg p-2 text-sm bg-white">
+          </div>
+          <div class="sm:col-span-2">
+            <button onclick="addItem()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-lg text-sm transition shadow-sm">
+              เพิ่มลงบิล
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ปุ่มบันทึกเป็นรูปภาพ -->
+      <div class="flex justify-end gap-3 pt-2">
+        <button id="saveBtn" onclick="saveAsImage()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center gap-2 shadow-md transition transform active:scale-95">
+          <span>📸</span> บันทึกบิลเป็นรูปภาพ (PNG)
+        </button>
+      </div>
+    </div>
+
+    <!-- ส่วนตัวบิลที่จะถูกเซฟเป็นรูปภาพ -->
+    <div id="invoiceContainer" class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <!-- Header บิล -->
+      <div class="bg-gradient-to-r from-zinc-900 to-black text-white p-6 border-b-4 border-amber-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <h1 class="text-2xl font-black tracking-wide text-amber-400">HALFWAY MR. FANBOY</h1>
+            <p class="text-xs text-slate-400 mt-0.5 tracking-wider">OFFICIAL MERCHANDISE ORDER SUMMARY</p>
+          </div>
+          <div class="text-right">
+            <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-full text-xs font-semibold" id="invStatusBadge">
+              ชำระเงินเรียบร้อยแล้ว
+            </span>
+            <p class="text-xs text-slate-400 mt-2">วันที่: <span id="invDate"></span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ข้อมูลลูกค้า & วิธีการรับ -->
+      <div class="p-6 bg-slate-50/70 border-b border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">ข้อมูลลูกค้า</span>
+          <p class="font-semibold text-slate-800 text-base" id="invCustName">-</p>
+          <p class="text-slate-600 text-xs mt-0.5" id="invCustSocial">ช่องทาง: -</p>
+        </div>
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">การจัดส่ง / การรับสินค้า</span>
+          <p class="font-medium text-slate-800" id="invShippingMethod">-</p>
+          <p class="text-slate-600 text-xs mt-0.5 whitespace-pre-line" id="invCustAddress">-</p>
+        </div>
+      </div>
+
+      <!-- ตารางรายการสินค้า -->
+      <div class="p-6">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 text-slate-400 text-xs uppercase">
+                <th class="py-2.5">ลำดับ</th>
+                <th class="py-2.5">รายการสินค้า</th>
+                <th class="py-2.5">แบบ/เมมเบอร์</th>
+                <th class="py-2.5 text-right">ราคาสินค้า</th>
+                <th class="py-2.5 text-right text-amber-700">ค่าหิ้ว/ชิ้น</th>
+                <th class="py-2.5 text-center">จำนวน</th>
+                <th class="py-2.5 text-right">รวม (บาท)</th>
+                <th class="py-2.5 text-center action-col">ลบ</th>
+              </tr>
+            </thead>
+            <tbody id="cartTableBody" class="divide-y divide-slate-100">
+              <!-- รายการจะถูกใส่ด้วย JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- สรุปยอดรวม -->
+        <div class="mt-6 border-t pt-4 flex justify-end">
+          <div class="w-full md:w-72 space-y-2 text-sm">
+            <div class="flex justify-between text-slate-600">
+              <span>รวมค่าสินค้า:</span>
+              <span id="invGoodsSubtotal">0 ฿</span>
+            </div>
+            <div class="flex justify-between text-amber-700">
+              <span>รวมค่าหิ้ว:</span>
+              <span id="invCarrySubtotal">0 ฿</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>ค่าจัดส่ง:</span>
+              <span id="invShipping">0 ฿</span>
+            </div>
+            <div class="flex justify-between font-bold text-lg text-slate-900 border-t pt-2">
+              <span>ยอดรวมสุทธิ:</span>
+              <span class="text-amber-600" id="invTotal">0 ฿</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ท้ายบิล -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 text-center text-xs text-slate-400">
+        ขอบคุณสำหรับการสั่งซื้อสินค้า | Thank you for your support!
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // รายการสินค้าอ้างอิงจากรูปภาพ
+    const catalog = [
+      { id: 1, name: "Phone Back Clip with Lanyard", price: 490, options: ["Standard"] },
+      { id: 2, name: "Magnetic Wallet Stand", price: 490, options: ["Standard"] },
+      { id: 3, name: "Mini Standee", price: 390, options: ["A - THIRD", "B - WAN", "C - NINE", "D - RENJI", "E - TIME", "F - JAY"] },
+      { id: 4, name: "Keychain (EP.1 Edition)", price: 290, options: ["A - THIRD", "B - WAN", "C - NINE", "D - RENJI", "E - TIME", "F - JAY"] },
+      { id: 5, name: "Magsafe Griptok", price: 490, options: ["A - THIRD", "B - WAN", "C - NINE", "D - RENJI", "E - TIME", "F - JAY"] },
+      { id: 6, name: "Character Pin Set", price: 390, options: ["Full Set"] },
+      { id: 7, name: "Tumbler", price: 890, options: ["Black"] },
+      { id: 8, name: "Tote Bag", price: 890, options: ["Navy Blue"] },
+      { id: 9, name: "Cropped Top (Showbiz Baby)", price: 690, options: ["Free Size"] },
+      { id: 10, name: "Boxy T-Shirt (No Pain No Gain)", price: 790, options: ["S", "M", "L", "XL"] },
+      { id: 11, name: "Basic T-Shirt (MRFB)", price: 690, options: ["A - WHITE (M)", "A - WHITE (L)", "A - WHITE (XL)", "B - BLACK (M)", "B - BLACK (L)", "B - BLACK (XL)"] },
+      // หน้า 2
+      { id: 12, name: "Random Photocards (OST Edition)", price: 390, options: ["NO PAIN NO GAIN", "FANBOY", "NEW: EYES ON ME", "NEW: SAFE ZONE"] },
+      { id: 13, name: "Phone Hipper (NEW)", price: 290, options: ["A - THIRD", "B - WAN", "C - NINE", "D - RENJI", "E - TIME", "F - JAY"] },
+      { id: 14, name: "Magnetic Card Holder", price: 490, options: ["A - THIRD WAN", "B - NINE (NEW)", "C - RENJI TIME (NEW)", "D - JAY (NEW)"] },
+      { id: 15, name: "Pen (NEW)", price: 190, options: ["A - THIRD", "B - WAN", "C - NINE", "D - RENJI", "E - TIME", "F - JAY"] },
+      { id: 16, name: "Photoset (Busking Edition)", price: 490, options: ["A - THIRD", "B - WAN", "C - NINE", "D - RENJI"] }
+    ];
+
+    let cart = [];
+
+    function initDropdown() {
+      const prodSelect = document.getElementById('productSelect');
+      catalog.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${item.name} (${item.price} THB)`;
+        prodSelect.appendChild(opt);
+      });
+      updateSubOptions();
+      document.getElementById('invDate').innerText = new Date().toLocaleDateString('th-TH');
+    }
+
+    function updateSubOptions() {
+      const prodIdx = document.getElementById('productSelect').value;
+      const subSelect = document.getElementById('subOptionSelect');
+      subSelect.innerHTML = '';
+      catalog[prodIdx].options.forEach(opt => {
+        const optionEl = document.createElement('option');
+        optionEl.value = opt;
+        optionEl.textContent = opt;
+        subSelect.appendChild(optionEl);
+      });
+    }
+
+    function toggleShippingFields() {
+      const type = document.getElementById('shippingType').value;
+      const addrLabel = document.getElementById('addressLabel');
+      const addrInput = document.getElementById('custAddress');
+      const feeInput = document.getElementById('shippingFee');
+
+      if (type === 'นัดรับ') {
+        addrLabel.textContent = "สถานที่นัดรับ / วันเวลานัดหมาย";
+        addrInput.placeholder = "เช่น นัดรับหน้าสยามพารากอน วันเสาร์ 14:00 น.";
+        feeInput.value = 0;
+      } else {
+        addrLabel.textContent = "ที่อยู่จัดส่ง / เบอร์โทรศัพท์";
+        addrInput.placeholder = "กรอกที่อยู่จัดส่ง พร้อมเบอร์โทรติดต่อ...";
+        feeInput.value = 50;
+      }
+      renderInvoice();
+    }
+
+    function addItem() {
+      const prodIdx = document.getElementById('productSelect').value;
+      const option = document.getElementById('subOptionSelect').value;
+      const qty = parseInt(document.getElementById('itemQty').value) || 1;
+      const carryFee = parseFloat(document.getElementById('itemCarryFee').value) || 0;
+      const product = catalog[prodIdx];
+
+      cart.push({
+        name: product.name,
+        price: product.price,
+        carryFee: carryFee,
+        option: option,
+        qty: qty
+      });
+
+      renderInvoice();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderInvoice();
+    }
+
+    function renderInvoice() {
+      const name = document.getElementById('custName').value || "-";
+      const social = document.getElementById('custSocial').value;
+      const handle = document.getElementById('custHandle').value;
+      const shipType = document.getElementById('shippingType').value;
+      const address = document.getElementById('custAddress').value || "-";
+      const status = document.getElementById('paymentStatus').value;
+      const shippingFee = parseFloat(document.getElementById('shippingFee').value) || 0;
+
+      document.getElementById('invCustName').textContent = name;
+      document.getElementById('invCustSocial').textContent = `ช่องทาง: ${social} ${handle ? `(${handle})` : ''}`;
+      document.getElementById('invShippingMethod').textContent = `รูปแบบ: ${shipType}`;
+      document.getElementById('invCustAddress').textContent = address;
+      
+      const badge = document.getElementById('invStatusBadge');
+      badge.textContent = status;
+      if (status.includes('รอ')) {
+        badge.className = "inline-block px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-full text-xs font-semibold";
+      } else {
+        badge.className = "inline-block px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 rounded-full text-xs font-semibold";
+      }
+
+      const tbody = document.getElementById('cartTableBody');
+      tbody.innerHTML = '';
+      
+      let goodsSubtotal = 0;
+      let carrySubtotal = 0;
+
+      if (cart.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-400 text-xs">ยังไม่มีรายการสินค้าในบิล</td></tr>`;
+      } else {
+        cart.forEach((item, index) => {
+          const itemGoodsTotal = item.price * item.qty;
+          const itemCarryTotal = item.carryFee * item.qty;
+          const lineTotal = itemGoodsTotal + itemCarryTotal;
+
+          goodsSubtotal += itemGoodsTotal;
+          carrySubtotal += itemCarryTotal;
+
+          const tr = document.createElement('tr');
+          tr.className = "text-slate-700 border-b border-slate-100";
+          tr.innerHTML = `
+            <td class="py-3 font-medium text-slate-400 text-xs">${index + 1}</td>
+            <td class="py-3 font-semibold">${item.name}</td>
+            <td class="py-3 text-slate-500">${item.option}</td>
+            <td class="py-3 text-right">${item.price.toLocaleString()}</td>
+            <td class="py-3 text-right text-amber-600 font-medium">+${item.carryFee.toLocaleString()}</td>
+            <td class="py-3 text-center">${item.qty}</td>
+            <td class="py-3 text-right font-semibold text-slate-900">${lineTotal.toLocaleString()}</td>
+            <td class="py-3 text-center action-col">
+              <button onclick="removeItem(${index})" class="text-rose-500 hover:text-rose-700 text-xs">✕ ลบ</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const total = goodsSubtotal + carrySubtotal + shippingFee;
+      document.getElementById('invGoodsSubtotal').textContent = `${goodsSubtotal.toLocaleString()} ฿`;
+      document.getElementById('invCarrySubtotal').textContent = `${carrySubtotal.toLocaleString()} ฿`;
+      document.getElementById('invShipping').textContent = `${shippingFee.toLocaleString()} ฿`;
+      document.getElementById('invTotal').textContent = `${total.toLocaleString()} ฿`;
+    }
+
+    // ฟังก์ชันแปลงตัวบิลเป็นรูปภาพและดาวน์โหลดลงเครื่องทันที
+    function saveAsImage() {
+      const btn = document.getElementById('saveBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '⏳ กำลังประมวลผลรูปภาพ...';
+      btn.disabled = true;
+
+      // ซ่อนคอลัมน์ปุ่ม "ลบ" ชั่วคราวก่อนจับภาพ
+      const actionCols = document.querySelectorAll('.action-col');
+      actionCols.forEach(el => el.style.display = 'none');
+
+      const invoiceElement = document.getElementById('invoiceContainer');
+      const custName = document.getElementById('custName').value.trim() || 'order';
+
+      html2canvas(invoiceElement, {
+        scale: 2, // สเกล 2 เท่า ให้ภาพคมชัดสูงแม้เปิดในมือถือ
+        backgroundColor: '#ffffff',
+        useCORS: true
+      }).then(canvas => {
+        // ดาวน์โหลดไฟล์อัตโนมัติ
+        const link = document.createElement('a');
+        link.download = `บิล_${custName}_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+        // คืนค่าปุ่มและคอลัมน์ลบ
+        actionCols.forEach(el => el.style.display = '');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }).catch(err => {
+        alert('เกิดข้อผิดพลาดในการบันทึกภาพ กรุณาลองใหม่อีกครั้ง');
+        actionCols.forEach(el => el.style.display = '');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      });
+    }
+
+    ['custName', 'custHandle', 'custAddress', 'custSocial', 'paymentStatus'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderInvoice);
+      document.getElementById(id).addEventListener('change', renderInvoice);
+    });
+
+    initDropdown();
+    renderInvoice();
+  </script>
+</body>
+</html>
