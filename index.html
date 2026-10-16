@@ -2,204 +2,196 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบออกบิลสรุปรายการสั่งซื้อ - HALFWAY MR.FANBOY</title>
-  <!-- Tailwind CSS สำหรับจัดดีไซน์ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>สรุปรายการสั่งซื้อ - HALFWAY MR.FANBOY</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- ฟอนต์ภาษาไทย Prompt -->
+  <!-- Google Fonts: Prompt -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- ไลบรารีแปลงหน้าเว็บเป็นรูปภาพ -->
+  <!-- html2canvas สำหรับเซฟรูปภาพ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
-    body { font-family: 'Prompt', sans-serif; }
+    body { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
+    /* ล็อกความกว้างตัวบิลให้ได้สัดส่วนการ์ดมือถือสวยงามเวลาเซฟรูป */
+    #invoiceContainer {
+      width: 100%;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+<body class="bg-slate-100 text-slate-800 p-3 sm:p-6 pb-20">
 
-  <div class="max-w-4xl mx-auto space-y-6">
-    <!-- ฟอร์มกรอกข้อมูล (จะไม่ติดไปในรูป) -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-      <h2 class="text-xl font-bold text-slate-800 mb-4 pb-2 border-b flex items-center gap-2">
-        <span>📝</span> บันทึกข้อมูลคำสั่งซื้อ
-      </h2>
+  <div class="max-w-md mx-auto space-y-5">
+    
+    <!-- ส่วนฟอร์มกรอกข้อมูลสำหรับคนขาย -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h2 class="text-base font-bold text-slate-800 flex items-center gap-1.5">
+          <span>📋</span> กรอกข้อมูลสั่งซื้อ
+        </h2>
+        <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium">สำหรับร้านค้า</span>
+      </div>
 
       <!-- ข้อมูลลูกค้า -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div class="space-y-3">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อลูกค้า</label>
-          <input type="text" id="custName" placeholder="เช่น คุณสมชาย รักแฟนบอย" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อลูกค้า</label>
+          <input type="text" id="custName" placeholder="เช่น คุณเอิร์ธ" class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">ช่องทางโซเชียล</label>
-            <select id="custSocial" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">โซเชียลมีเดีย</label>
+            <select id="custSocial" class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none">
               <option value="X (Twitter)">X (Twitter)</option>
               <option value="Instagram">Instagram</option>
-              <option value="Facebook">Facebook</option>
               <option value="Line">Line</option>
+              <option value="Facebook">Facebook</option>
               <option value="TikTok">TikTok</option>
               <option value="อื่นๆ">อื่นๆ</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อบัญชี / Username</label>
-            <input type="text" id="custHandle" placeholder="@username" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Username / แอคเคาท์</label>
+            <input type="text" id="custHandle" placeholder="@ชื่อแอค" class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none">
           </div>
         </div>
       </div>
 
-      <!-- รูปแบบการจัดส่งและสถานะ -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <!-- การจัดส่ง & สถานะ -->
+      <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">รูปแบบการรับสินค้า</label>
-          <select id="shippingType" onchange="toggleShippingFields()" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">รูปแบบรับสินค้า</label>
+          <select id="shippingType" onchange="toggleShippingFields()" class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none">
             <option value="จัดส่งพัสดุ">📦 จัดส่งพัสดุ</option>
             <option value="นัดรับ">🤝 นัดรับสินค้า</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">ค่าจัดส่ง (บาท)</label>
-          <input type="number" id="shippingFee" value="50" min="0" oninput="renderInvoice()" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">สถานะการชำระเงิน</label>
-          <select id="paymentStatus" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-            <option value="ชำระเงินเรียบร้อยแล้ว">🟢 ชำระเงินเรียบร้อยแล้ว</option>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">สถานะเงิน</label>
+          <select id="paymentStatus" class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+            <option value="ชำระเงินแล้ว">🟢 ชำระแล้ว</option>
             <option value="รอชำระเงิน">🟡 รอชำระเงิน</option>
             <option value="มัดจำแล้ว">🔵 มัดจำแล้ว</option>
           </select>
         </div>
       </div>
 
-      <div class="mb-4">
-        <label id="addressLabel" class="block text-sm font-medium text-slate-700 mb-1">ที่อยู่จัดส่ง / เบอร์โทรศัพท์</label>
-        <textarea id="custAddress" rows="2" placeholder="กรอกที่อยู่จัดส่ง พร้อมเบอร์โทรติดต่อ..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
-      </div>
-
-      <!-- เพิ่มรายการสินค้า & ค่าหิ้วต่อชิ้น -->
-      <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 mb-4">
-        <h3 class="text-sm font-semibold text-amber-900 mb-2">➕ เลือกสินค้าและกำหนดค่าหิ้ว</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-          <div class="sm:col-span-5">
-            <label class="block text-xs text-slate-600 mb-1">รายการสินค้า</label>
-            <select id="productSelect" onchange="updateSubOptions()" class="w-full border rounded-lg p-2 text-sm bg-white"></select>
-          </div>
-          <div class="sm:col-span-3">
-            <label class="block text-xs text-slate-600 mb-1">แบบ / เมมเบอร์</label>
-            <select id="subOptionSelect" class="w-full border rounded-lg p-2 text-sm bg-white"></select>
-          </div>
-          <div class="sm:col-span-1">
-            <label class="block text-xs text-slate-600 mb-1">จำนวน</label>
-            <input type="number" id="itemQty" value="1" min="1" class="w-full border rounded-lg p-2 text-sm bg-white">
-          </div>
-          <div class="sm:col-span-1">
-            <label class="block text-xs text-amber-800 font-semibold mb-1">ค่าหิ้ว/ชิ้น</label>
-            <input type="number" id="itemCarryFee" value="20" min="0" class="w-full border border-amber-300 rounded-lg p-2 text-sm bg-white">
-          </div>
-          <div class="sm:col-span-2">
-            <button onclick="addItem()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-lg text-sm transition shadow-sm">
-              เพิ่มลงบิล
-            </button>
-          </div>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="col-span-2">
+          <label id="addressLabel" class="block text-xs font-semibold text-slate-600 mb-1">ที่อยู่จัดส่ง / เบอร์โทร</label>
+          <textarea id="custAddress" rows="1" placeholder="บ้านเลขที่ ตำบล อำเภอ จ. เบอร์โทร..." class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">ค่าส่ง (฿)</label>
+          <input type="number" id="shippingFee" value="50" min="0" oninput="renderInvoice()" class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none">
         </div>
       </div>
 
-      <!-- ปุ่มบันทึกเป็นรูปภาพ -->
-      <div class="flex justify-end gap-3 pt-2">
-        <button id="saveBtn" onclick="saveAsImage()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center gap-2 shadow-md transition transform active:scale-95">
-          <span>📸</span> บันทึกบิลเป็นรูปภาพ (PNG)
+      <!-- เพิ่มสินค้า -->
+      <div class="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200 space-y-2.5">
+        <p class="text-xs font-bold text-amber-900">➕ เพิ่มรายการสินค้า</p>
+        <div>
+          <select id="productSelect" onchange="updateSubOptions()" class="w-full border rounded-lg p-2 text-xs bg-white"></select>
+        </div>
+        <div>
+          <select id="subOptionSelect" class="w-full border rounded-lg p-2 text-xs bg-white"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] text-slate-500">จำนวน</label>
+            <input type="number" id="itemQty" value="1" min="1" class="w-full border rounded-lg p-1.5 text-xs bg-white text-center">
+          </div>
+          <div>
+            <label class="text-[11px] text-amber-800 font-semibold">ค่าหิ้ว/ชิ้น (฿)</label>
+            <input type="number" id="itemCarryFee" value="20" min="0" class="w-full border border-amber-300 rounded-lg p-1.5 text-xs bg-white text-center font-bold">
+          </div>
+        </div>
+        <button onclick="addItem()" class="w-full bg-amber-600 active:bg-amber-700 text-white font-medium py-2 rounded-lg text-xs transition shadow-sm">
+          + เพิ่มลงในบิล
         </button>
       </div>
+
+      <!-- ปุ่มเซฟรูปภาพ -->
+      <button id="saveBtn" onclick="saveAsImage()" class="w-full bg-emerald-600 active:bg-emerald-700 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-md">
+        <span>📸</span> บันทึกบิลเป็นรูปภาพลงเครื่อง
+      </button>
     </div>
 
-    <!-- ส่วนตัวบิลที่จะถูกเซฟเป็นรูปภาพ -->
-    <div id="invoiceContainer" class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-      <!-- Header บิล -->
-      <div class="bg-gradient-to-r from-zinc-900 to-black text-white p-6 border-b-4 border-amber-500">
+    <!-- ส่วนพรีวิวบิลที่จะเซฟเป็นรูปภาพ (สัดส่วนการ์ดมือถือสวยงาม) -->
+    <div id="invoiceContainer" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+      <!-- ส่วนหัว Header -->
+      <div class="bg-gradient-to-br from-zinc-900 via-neutral-900 to-black text-white p-5 text-center relative border-b-2 border-amber-500">
+        <span class="inline-block px-3 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full text-[11px] font-semibold mb-1 tracking-wider" id="invStatusBadge">
+          ชำระเงินเรียบร้อยแล้ว
+        </span>
+        <h1 class="text-xl font-black tracking-wider text-amber-400">HALFWAY MR. FANBOY</h1>
+        <p class="text-[10px] text-zinc-400 tracking-widest uppercase">Order Summary Receipt</p>
+        <p class="text-[11px] text-zinc-400 mt-2">วันที่ออกบิล: <span id="invDate" class="text-zinc-200 font-medium"></span></p>
+      </div>
+
+      <!-- ข้อมูลผู้สั่ง & ปลายทางจัดส่ง -->
+      <div class="p-4 bg-slate-50/80 border-b border-slate-200 text-xs space-y-2">
         <div class="flex justify-between items-start">
-          <div>
-            <h1 class="text-2xl font-black tracking-wide text-amber-400">HALFWAY MR. FANBOY</h1>
-            <p class="text-xs text-slate-400 mt-0.5 tracking-wider">OFFICIAL MERCHANDISE ORDER SUMMARY</p>
-          </div>
-          <div class="text-right">
-            <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-full text-xs font-semibold" id="invStatusBadge">
-              ชำระเงินเรียบร้อยแล้ว
-            </span>
-            <p class="text-xs text-slate-400 mt-2">วันที่: <span id="invDate"></span></p>
-          </div>
+          <span class="text-slate-400 font-medium">ลูกค้า:</span>
+          <span class="font-bold text-slate-800 text-right text-sm" id="invCustName">-</span>
+        </div>
+        <div class="flex justify-between items-start">
+          <span class="text-slate-400 font-medium">ช่องทางติดต่อ:</span>
+          <span class="font-medium text-slate-700 text-right" id="invCustSocial">-</span>
+        </div>
+        <div class="flex justify-between items-start">
+          <span class="text-slate-400 font-medium">รูปแบบรับของ:</span>
+          <span class="font-semibold text-amber-700 text-right" id="invShippingMethod">-</span>
+        </div>
+        <div class="pt-1.5 border-t border-slate-200/60 flex justify-between items-start">
+          <span class="text-slate-400 font-medium shrink-0 mr-2">ที่อยู่/นัดหมาย:</span>
+          <span class="font-normal text-slate-700 text-right break-words leading-relaxed" id="invCustAddress">-</span>
         </div>
       </div>
 
-      <!-- ข้อมูลลูกค้า & วิธีการรับ -->
-      <div class="p-6 bg-slate-50/70 border-b border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">ข้อมูลลูกค้า</span>
-          <p class="font-semibold text-slate-800 text-base" id="invCustName">-</p>
-          <p class="text-slate-600 text-xs mt-0.5" id="invCustSocial">ช่องทาง: -</p>
-        </div>
-        <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">การจัดส่ง / การรับสินค้า</span>
-          <p class="font-medium text-slate-800" id="invShippingMethod">-</p>
-          <p class="text-slate-600 text-xs mt-0.5 whitespace-pre-line" id="invCustAddress">-</p>
-        </div>
-      </div>
-
-      <!-- ตารางรายการสินค้า -->
-      <div class="p-6">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead>
-              <tr class="border-b border-slate-200 text-slate-400 text-xs uppercase">
-                <th class="py-2.5">ลำดับ</th>
-                <th class="py-2.5">รายการสินค้า</th>
-                <th class="py-2.5">แบบ/เมมเบอร์</th>
-                <th class="py-2.5 text-right">ราคาสินค้า</th>
-                <th class="py-2.5 text-right text-amber-700">ค่าหิ้ว/ชิ้น</th>
-                <th class="py-2.5 text-center">จำนวน</th>
-                <th class="py-2.5 text-right">รวม (บาท)</th>
-                <th class="py-2.5 text-center action-col">ลบ</th>
-              </tr>
-            </thead>
-            <tbody id="cartTableBody" class="divide-y divide-slate-100">
-              <!-- รายการจะถูกใส่ด้วย JS -->
-            </tbody>
-          </table>
+      <!-- รายการสินค้า (แบบ Card List ดูง่ายบนมือถือ) -->
+      <div class="p-4 space-y-3">
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">รายการสินค้าที่สั่งซื้อ</p>
+        
+        <div id="cartListContainer" class="space-y-2.5">
+          <!-- Items -->
         </div>
 
-        <!-- สรุปยอดรวม -->
-        <div class="mt-6 border-t pt-4 flex justify-end">
-          <div class="w-full md:w-72 space-y-2 text-sm">
-            <div class="flex justify-between text-slate-600">
-              <span>รวมค่าสินค้า:</span>
-              <span id="invGoodsSubtotal">0 ฿</span>
-            </div>
-            <div class="flex justify-between text-amber-700">
-              <span>รวมค่าหิ้ว:</span>
-              <span id="invCarrySubtotal">0 ฿</span>
-            </div>
-            <div class="flex justify-between text-slate-600">
-              <span>ค่าจัดส่ง:</span>
-              <span id="invShipping">0 ฿</span>
-            </div>
-            <div class="flex justify-between font-bold text-lg text-slate-900 border-t pt-2">
-              <span>ยอดรวมสุทธิ:</span>
-              <span class="text-amber-600" id="invTotal">0 ฿</span>
-            </div>
+        <!-- กล่องสรุปยอดเงิน (ไฮไลต์ชัดเจน) -->
+        <div class="mt-4 pt-3 border-t-2 border-dashed border-slate-200 space-y-1.5 text-xs">
+          <div class="flex justify-between text-slate-500">
+            <span>รวมค่าสินค้า</span>
+            <span id="invGoodsSubtotal" class="font-medium text-slate-700">0 ฿</span>
+          </div>
+          <div class="flex justify-between text-amber-800">
+            <span>รวมค่าหิ้ว</span>
+            <span id="invCarrySubtotal" class="font-medium">0 ฿</span>
+          </div>
+          <div class="flex justify-between text-slate-500">
+            <span>ค่าจัดส่ง</span>
+            <span id="invShipping" class="font-medium text-slate-700">0 ฿</span>
+          </div>
+          <div class="flex justify-between items-center bg-amber-50 p-2.5 rounded-xl border border-amber-200/80 mt-2">
+            <span class="font-bold text-slate-900 text-sm">ยอดรวมสุทธิ</span>
+            <span id="invTotal" class="font-black text-amber-600 text-lg">0 ฿</span>
           </div>
         </div>
       </div>
 
       <!-- ท้ายบิล -->
-      <div class="p-4 bg-slate-50 border-t border-slate-100 text-center text-xs text-slate-400">
-        ขอบคุณสำหรับการสั่งซื้อสินค้า | Thank you for your support!
+      <div class="p-3 bg-zinc-900 text-center text-[10px] text-zinc-400 tracking-wide">
+        THANK YOU FOR YOUR PURCHASE ✨
       </div>
     </div>
+
   </div>
 
   <script>
-    // รายการสินค้าอ้างอิงจากรูปภาพ
+    // แคตตาล็อกสินค้า
     const catalog = [
       { id: 1, name: "Phone Back Clip with Lanyard", price: 490, options: ["Standard"] },
       { id: 2, name: "Magnetic Wallet Stand", price: 490, options: ["Standard"] },
@@ -212,7 +204,6 @@
       { id: 9, name: "Cropped Top (Showbiz Baby)", price: 690, options: ["Free Size"] },
       { id: 10, name: "Boxy T-Shirt (No Pain No Gain)", price: 790, options: ["S", "M", "L", "XL"] },
       { id: 11, name: "Basic T-Shirt (MRFB)", price: 690, options: ["A - WHITE (M)", "A - WHITE (L)", "A - WHITE (XL)", "B - BLACK (M)", "B - BLACK (L)", "B - BLACK (XL)"] },
-      // หน้า 2
       { id: 12, name: "Random Photocards (OST Edition)", price: 390, options: ["NO PAIN NO GAIN", "FANBOY", "NEW: EYES ON ME", "NEW: SAFE ZONE"] },
       { id: 13, name: "Phone Hipper (NEW)", price: 290, options: ["A - THIRD", "B - WAN", "C - NINE", "D - RENJI", "E - TIME", "F - JAY"] },
       { id: 14, name: "Magnetic Card Holder", price: 490, options: ["A - THIRD WAN", "B - NINE (NEW)", "C - RENJI TIME (NEW)", "D - JAY (NEW)"] },
@@ -227,7 +218,7 @@
       catalog.forEach((item, idx) => {
         const opt = document.createElement('option');
         opt.value = idx;
-        opt.textContent = `${item.name} (${item.price} THB)`;
+        opt.textContent = `${item.name} (${item.price}฿)`;
         prodSelect.appendChild(opt);
       });
       updateSubOptions();
@@ -253,12 +244,12 @@
       const feeInput = document.getElementById('shippingFee');
 
       if (type === 'นัดรับ') {
-        addrLabel.textContent = "สถานที่นัดรับ / วันเวลานัดหมาย";
-        addrInput.placeholder = "เช่น นัดรับหน้าสยามพารากอน วันเสาร์ 14:00 น.";
+        addrLabel.textContent = "สถานที่นัดรับ / วันเวลา";
+        addrInput.placeholder = "เช่น สยามพารากอน วันเสาร์ 15:00 น.";
         feeInput.value = 0;
       } else {
-        addrLabel.textContent = "ที่อยู่จัดส่ง / เบอร์โทรศัพท์";
-        addrInput.placeholder = "กรอกที่อยู่จัดส่ง พร้อมเบอร์โทรติดต่อ...";
+        addrLabel.textContent = "ที่อยู่จัดส่ง / เบอร์โทร";
+        addrInput.placeholder = "บ้านเลขที่ ตำบล อำเภอ จ. เบอร์โทร...";
         feeInput.value = 50;
       }
       renderInvoice();
@@ -288,35 +279,36 @@
     }
 
     function renderInvoice() {
-      const name = document.getElementById('custName').value || "-";
+      const name = document.getElementById('custName').value.trim() || "-";
       const social = document.getElementById('custSocial').value;
-      const handle = document.getElementById('custHandle').value;
+      const handle = document.getElementById('custHandle').value.trim();
       const shipType = document.getElementById('shippingType').value;
-      const address = document.getElementById('custAddress').value || "-";
+      const address = document.getElementById('custAddress').value.trim() || "-";
       const status = document.getElementById('paymentStatus').value;
       const shippingFee = parseFloat(document.getElementById('shippingFee').value) || 0;
 
       document.getElementById('invCustName').textContent = name;
-      document.getElementById('invCustSocial').textContent = `ช่องทาง: ${social} ${handle ? `(${handle})` : ''}`;
-      document.getElementById('invShippingMethod').textContent = `รูปแบบ: ${shipType}`;
+      document.getElementById('invCustSocial').textContent = `${social} ${handle ? `(${handle})` : ''}`;
+      document.getElementById('invShippingMethod').textContent = shipType;
       document.getElementById('invCustAddress').textContent = address;
       
       const badge = document.getElementById('invStatusBadge');
       badge.textContent = status;
       if (status.includes('รอ')) {
-        badge.className = "inline-block px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-full text-xs font-semibold";
+        badge.className = "inline-block px-3 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-full text-[11px] font-semibold mb-1";
       } else {
-        badge.className = "inline-block px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 rounded-full text-xs font-semibold";
+        badge.className = "inline-block px-3 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 rounded-full text-[11px] font-semibold mb-1";
       }
 
-      const tbody = document.getElementById('cartTableBody');
-      tbody.innerHTML = '';
+      // เรนเดอร์การ์ดสินค้าแบบ Mobile List
+      const container = document.getElementById('cartListContainer');
+      container.innerHTML = '';
       
       let goodsSubtotal = 0;
       let carrySubtotal = 0;
 
       if (cart.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-slate-400 text-xs">ยังไม่มีรายการสินค้าในบิล</td></tr>`;
+        container.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-dashed border-slate-200">ยังไม่มีรายการสินค้า</div>`;
       } else {
         cart.forEach((item, index) => {
           const itemGoodsTotal = item.price * item.qty;
@@ -326,21 +318,33 @@
           goodsSubtotal += itemGoodsTotal;
           carrySubtotal += itemCarryTotal;
 
-          const tr = document.createElement('tr');
-          tr.className = "text-slate-700 border-b border-slate-100";
-          tr.innerHTML = `
-            <td class="py-3 font-medium text-slate-400 text-xs">${index + 1}</td>
-            <td class="py-3 font-semibold">${item.name}</td>
-            <td class="py-3 text-slate-500">${item.option}</td>
-            <td class="py-3 text-right">${item.price.toLocaleString()}</td>
-            <td class="py-3 text-right text-amber-600 font-medium">+${item.carryFee.toLocaleString()}</td>
-            <td class="py-3 text-center">${item.qty}</td>
-            <td class="py-3 text-right font-semibold text-slate-900">${lineTotal.toLocaleString()}</td>
-            <td class="py-3 text-center action-col">
-              <button onclick="removeItem(${index})" class="text-rose-500 hover:text-rose-700 text-xs">✕ ลบ</button>
-            </td>
+          const card = document.createElement('div');
+          card.className = "p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs relative";
+          card.innerHTML = `
+            <div class="flex justify-between items-start pr-6">
+              <div>
+                <p class="font-bold text-slate-800 leading-snug">${item.name}</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">แบบ: <span class="font-medium text-slate-700">${item.option}</span></p>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-end mt-2 pt-2 border-t border-slate-200/60 text-[11px]">
+              <div class="text-slate-500">
+                <span>${item.price}฿</span>
+                <span class="text-amber-700 font-semibold">(หิ้ว +${item.carryFee}฿)</span>
+                <span>× ${item.qty} ชิ้น</span>
+              </div>
+              <div class="font-bold text-slate-900 text-xs">
+                ${lineTotal.toLocaleString()} ฿
+              </div>
+            </div>
+
+            <!-- ปุ่มลบชิ้นสินค้า (จะถูกซ่อนตอนแคปภาพ) -->
+            <button onclick="removeItem(${index})" class="del-btn absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold p-1 text-xs leading-none">
+              ✕
+            </button>
           `;
-          tbody.appendChild(tr);
+          container.appendChild(card);
         });
       }
 
@@ -351,38 +355,36 @@
       document.getElementById('invTotal').textContent = `${total.toLocaleString()} ฿`;
     }
 
-    // ฟังก์ชันแปลงตัวบิลเป็นรูปภาพและดาวน์โหลดลงเครื่องทันที
+    // ฟังก์ชันเซฟภาพบิล (ขนาดคมชัด พอดีจอ)
     function saveAsImage() {
       const btn = document.getElementById('saveBtn');
       const originalText = btn.innerHTML;
-      btn.innerHTML = '⏳ กำลังประมวลผลรูปภาพ...';
+      btn.innerHTML = '⏳ กำลังบันทึกรูปภาพ...';
       btn.disabled = true;
 
-      // ซ่อนคอลัมน์ปุ่ม "ลบ" ชั่วคราวก่อนจับภาพ
-      const actionCols = document.querySelectorAll('.action-col');
-      actionCols.forEach(el => el.style.display = 'none');
+      // ซ่อนปุ่มลบในบิลก่อนถ่ายภาพ
+      const delBtns = document.querySelectorAll('.del-btn');
+      delBtns.forEach(b => b.style.display = 'none');
 
       const invoiceElement = document.getElementById('invoiceContainer');
       const custName = document.getElementById('custName').value.trim() || 'order';
 
       html2canvas(invoiceElement, {
-        scale: 2, // สเกล 2 เท่า ให้ภาพคมชัดสูงแม้เปิดในมือถือ
+        scale: 2.5, // ความละเอียดสูง คมชัดบนหน้าจอมือถือทุกรุ่น
         backgroundColor: '#ffffff',
         useCORS: true
       }).then(canvas => {
-        // ดาวน์โหลดไฟล์อัตโนมัติ
         const link = document.createElement('a');
-        link.download = `บิล_${custName}_${Date.now()}.png`;
+        link.download = `Bill_${custName}_${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
 
-        // คืนค่าปุ่มและคอลัมน์ลบ
-        actionCols.forEach(el => el.style.display = '');
+        delBtns.forEach(b => b.style.display = '');
         btn.innerHTML = originalText;
         btn.disabled = false;
       }).catch(err => {
-        alert('เกิดข้อผิดพลาดในการบันทึกภาพ กรุณาลองใหม่อีกครั้ง');
-        actionCols.forEach(el => el.style.display = '');
+        alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ');
+        delBtns.forEach(b => b.style.display = '');
         btn.innerHTML = originalText;
         btn.disabled = false;
       });
